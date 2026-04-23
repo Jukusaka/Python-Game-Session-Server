@@ -1,0 +1,35 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'  # or your preferred version
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: testing
+      id: testing
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: testing
+        setup-command: ""
+        command: python -m unittest discover -s . -p "test*.py" -v
+        timeout: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TESTING_RESULTS: "${{steps.testing.outputs.result}}"
+      with:
+        runners: testing
