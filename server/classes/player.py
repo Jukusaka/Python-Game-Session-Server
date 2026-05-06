@@ -2,12 +2,14 @@ from pydantic import (
     BaseModel,
     field_validator,
     ValidationError,
-    ConfigDict
+    ConfigDict,
+    model_validator
 )
 
 from weapon import Weapon
 from armour import Armour
-from accessory import Accessory
+from accessory import Accessory, Stat
+from item import Item
 
 from enum import Enum
 
@@ -42,6 +44,8 @@ class Player(BaseModel):
 
     # Validators
 
+    # For general info
+
     @field_validator('player_name')
     @classmethod
     def check_alphanumeric(cls, v: str) -> str:
@@ -51,8 +55,45 @@ class Player(BaseModel):
     
     @field_validator('player_class')
     @classmethod
-    def check_if_valid_class(cls, new_player_class: Player_Class) -> Player_Class:
+    def check_if_valid_class(cls, v: Player_Class) -> Player_Class:
         allowed = [Player_Class.KNIGHT, Player_Class.CLERIC]
-        if new_player_class not in allowed:
+        if v not in allowed:
             raise ValueError('The class of the player is not allowed')
-        return new_player_class
+        return v
+    
+    # For Stats
+
+    @field_validator('base_max_health')
+    @classmethod
+    def check_if_valid_base_max_health(cls, v: float) -> float:
+        if v <= 0:
+            raise ValueError('Too little max hp of a player')
+        return v
+        
+    # For items
+    @field_validator('weapon_slot')
+    @classmethod
+    def check_if_valid_weapon(cls, v: Weapon) -> Weapon:
+        if v is not Weapon:
+            raise ValueError('New Weapon is not a weapon type')
+        
+
+    # Model validators
+    @model_validator(mode='after')
+    def validate_weapon(self):
+
+        # Damage boosts from accesories are multiplicative
+        damage_multipliers = 1
+        if(self.accessory_slot_1.what_stat_is_multiplied == Stat.DAMAGE):
+            damage_multipliers * (self.accessory_slot_1.stat_multiplier * self.self.accessory_slot_1.floor_multiplier)
+
+        if(self.accessory_slot_2.what_stat_is_multiplied == Stat.DAMAGE):
+            damage_multipliers * (self.accessory_slot_2.stat_multiplier * self.self.accessory_slot_2.floor_multiplier)
+
+        if(self.accessory_slot_3.what_stat_is_multiplied == Stat.DAMAGE):
+            damage_multipliers * (self.accessory_slot_3.stat_multiplier * self.self.accessory_slot_3.floor_multiplier)
+
+        self.damage = (self.base_damage + self.weapon_slot.damage) * damage_multipliers
+        
+
+
