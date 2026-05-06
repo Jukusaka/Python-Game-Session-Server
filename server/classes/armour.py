@@ -2,8 +2,8 @@ from pydantic import (
     BaseModel
 )
 
-from item import Item
+from .item import Item
 
-class Armour(BaseModel, Item):
+class Armour(Item):
     defence_ammount: int # How much defence this armour gives
     max_health_increase: int # How much extra max health this armour gives

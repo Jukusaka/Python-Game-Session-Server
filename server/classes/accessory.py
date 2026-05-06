@@ -1,17 +1,24 @@
+from enum import Enum
+from .item import Item
 from pydantic import (
-    BaseModel
+    field_validator
 )
 
-from item import Item
-from enum import Enum
 
 class Stat(str, Enum):
     DAMAGE = "dmg"
     MAX_HEALTH = "maxhp"
-    HEALING_CAPASITY = "hc"
+    HEALING_CAPACITY = "hc"
     DEFENCE = "def"
 
 
 class Accessory(Item):
-    what_stat_is_multiplied: Stat # For example "dmg" will increase the damage of the player
-    stat_multiplier: float # This is the base multiplier of the accesory, so it is affected by the floor multiplier
+    what_stat_is_multiplied: Stat
+    stat_multiplier: float
+
+    @field_validator("stat_multiplier")
+    @classmethod
+    def validate_stat_multiplier(cls, v: float) -> float:
+        if v <= 0:
+            raise ValueError("stat_multiplier must be greater than 0")
+        return v

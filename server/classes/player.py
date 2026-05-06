@@ -6,10 +6,10 @@ from pydantic import (
     model_validator
 )
 
-from weapon import Weapon
-from armour import Armour
-from accessory import Accessory, Stat
-from item import Item
+from .weapon import Weapon
+from .armour import Armour
+from .accessory import Accessory, Stat
+from .item import Item
 
 from enum import Enum
 
@@ -80,9 +80,16 @@ class Player(BaseModel):
     @field_validator('base_healing_capacity')
     @classmethod
     def check_if_valid_base_healing_capacity(cls, v: float) -> float:
-        if v <= 0:
-            raise ValueError('Base healing capacity must be greater than 0')
+        if v < 0:
+            raise ValueError('Base healing capacity cannot be negative')
         return v
+
+    # However, if after it turns out player is not cleric, then healing cannot be positive
+    @model_validator(mode='after')
+    def validate_healing_allowed(self):
+        if self.player_class != PlayerClass.CLERIC and self.base_healing_capacity > 0:
+            raise ValueError('Only clerics may have a base_healing_capacity > 0')
+        return self
         
     # For items
     @field_validator('weapon_slot')
@@ -111,14 +118,16 @@ class Player(BaseModel):
             
             if accessory_slot.what_stat_is_multiplied == Stat.DAMAGE:
                 damage_multipliers *= multiplier
-            elif accessory_slot.what_stat_is_multiplied == Stat.HEALTH:
+            elif accessory_slot.what_stat_is_multiplied == Stat.MAX_HEALTH:
                 health_multipliers *= multiplier
-            elif accessory_slot.what_stat_is_multiplied == Stat.HEALING:
+            elif accessory_slot.what_stat_is_multiplied == Stat.HEALING_CAPACITY:
                 healing_multipliers *= multiplier
         
-        # Apply multipliers to final stats
-        self.damage = (self.base_damage + self.weapon_slot.damage) * damage_multipliers
-        self.max_health = self.base_max_health * health_multipliers
-        self.healing_capacity = self.base_healing_capacity * healing_multipliers
+        # Apply multipliers to final stats (bypass pydantic assignment hooks)
+        object.__setattr__(self, 'damage', float((self.base_damage + self.weapon_slot.damage) * damage_multipliers))
+        object.__setattr__(self, 'max_health', float(self.base_max_health * health_multipliers))
+        object.__setattr__(self, 'healing_capacity', float(self.base_healing_capacity * healing_multipliers))
+
+        return self
         
         return self

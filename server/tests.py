@@ -3,6 +3,91 @@ import unittest
 from classes.enemy import Enemy
 from classes.item import Item
 from classes.weapon import Weapon, WeaponType
+from classes.player import Player, PlayerClass
+from classes.armour import Armour
+from classes.accessory import Accessory, Stat
+
+
+class TestPlayer(unittest.TestCase):
+
+    def setUp(self):
+        # Build items/accessories that satisfy Item fields
+        self.weapon = Weapon(
+            name="Sword",
+            sprite_path="sword.png",
+            floor_multiplier=1,
+            damage=5,
+            healing_capacity=0,
+            weapon_type=WeaponType.KNIGHT,
+        )
+        self.armour = Armour(
+            name="Plate",
+            sprite_path="plate.png",
+            floor_multiplier=1,
+            defence_ammount=2,
+            max_health_increase=10,
+        )
+        self.acc_dmg = Accessory(
+            name="DmgRing",
+            sprite_path="ring.png",
+            floor_multiplier=1,
+            what_stat_is_multiplied=Stat.DAMAGE,
+            stat_multiplier=1.5,
+        )
+        self.acc_none = Accessory(
+            name="Noop",
+            sprite_path="noop.png",
+            floor_multiplier=1,
+            what_stat_is_multiplied=Stat.DEFENCE,
+            stat_multiplier=1.0,
+        )
+
+        self.player = Player(
+            player_name="Hero1",
+            player_class=PlayerClass.KNIGHT,
+            base_max_health=100.0,
+            max_health=100.0,
+            current_health=100.0,
+            base_damage=10.0,
+            damage=10.0,
+            base_healing_capacity=0.0,
+            healing_capacity=0.0,
+            armour=0.0,
+            weapon_slot=self.weapon,
+            armour_slot=self.armour,
+            accessory_slot_1=self.acc_dmg,
+            accessory_slot_2=self.acc_none,
+            accessory_slot_3=self.acc_none,
+        )
+
+    def test_valid_player_creation(self):
+        self.assertEqual(self.player.player_name, "Hero1")
+        self.assertEqual(self.player.player_class, PlayerClass.KNIGHT)
+
+    def test_name_must_be_alphanumeric(self):
+        with self.assertRaises(ValueError):
+            Player(
+                player_name="bad name!",
+                player_class=PlayerClass.KNIGHT,
+                base_max_health=50,
+                max_health=50,
+                current_health=50,
+                base_damage=5,
+                damage=5,
+                base_healing_capacity=0,
+                healing_capacity=0,
+                armour=0,
+                weapon_slot=self.weapon,
+                armour_slot=self.armour,
+                accessory_slot_1=self.acc_none,
+                accessory_slot_2=self.acc_none,
+                accessory_slot_3=self.acc_none,
+            )
+
+    def test_damage_with_accessory_multiplier(self):
+        # damage = (base_damage + weapon.damage) * accessory_multiplier
+        expected = (self.player.base_damage + self.weapon.damage) * 1.5
+        self.assertAlmostEqual(self.player.damage, expected, places=6)
 
 
 class TestEnemy(unittest.TestCase):
