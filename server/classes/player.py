@@ -13,17 +13,17 @@ from item import Item
 
 from enum import Enum
 
-# Remember the class with endums is with capital letters
-class Player_Class(str, Enum):
+# Remember the class with enums is with capital letters
+class PlayerClass(str, Enum):
     KNIGHT = "knight"
-    CLERIC = "knight"
+    CLERIC = "cleric"
 
 class Player(BaseModel):
     model_config = ConfigDict(validate_assignment=True) # If the value is updated, then it reruns the validation
 
     # General info
     player_name: str
-    player_class: Player_Class # This is an enum!!!!! remember
+    player_class: PlayerClass # This is an enum!!!!! remember
 
     # Stats
     base_max_health: float # This is before stat modifiers
@@ -55,8 +55,8 @@ class Player(BaseModel):
     
     @field_validator('player_class')
     @classmethod
-    def check_if_valid_class(cls, v: Player_Class) -> Player_Class:
-        allowed = [Player_Class.KNIGHT, Player_Class.CLERIC]
+    def check_if_valid_class(cls, v: PlayerClass) -> PlayerClass:
+        allowed = [PlayerClass.KNIGHT, PlayerClass.CLERIC]
         if v not in allowed:
             raise ValueError('The class of the player is not allowed')
         return v
@@ -69,31 +69,56 @@ class Player(BaseModel):
         if v <= 0:
             raise ValueError('Too little max hp of a player')
         return v
+    
+    @field_validator('base_damage')
+    @classmethod
+    def check_if_valid_base_damage(cls, v: float) -> float:
+        if v <= 0:
+            raise ValueError('Base damage must be greater than 0')
+        return v
+    
+    @field_validator('base_healing_capacity')
+    @classmethod
+    def check_if_valid_base_healing_capacity(cls, v: float) -> float:
+        if v <= 0:
+            raise ValueError('Base healing capacity must be greater than 0')
+        return v
         
     # For items
     @field_validator('weapon_slot')
     @classmethod
     def check_if_valid_weapon(cls, v: Weapon) -> Weapon:
-        if v is not Weapon:
+        if not isinstance(v, Weapon):
             raise ValueError('New Weapon is not a weapon type')
-        
+        return v
 
-    # Model validators
+    # Model validator
     @model_validator(mode='after')
-    def validate_weapon(self):
-
-        # Damage boosts from accesories are multiplicative
-        damage_multipliers = 1
-        if(self.accessory_slot_1.what_stat_is_multiplied == Stat.DAMAGE):
-            damage_multipliers * (self.accessory_slot_1.stat_multiplier * self.self.accessory_slot_1.floor_multiplier)
-
-        if(self.accessory_slot_2.what_stat_is_multiplied == Stat.DAMAGE):
-            damage_multipliers * (self.accessory_slot_2.stat_multiplier * self.self.accessory_slot_2.floor_multiplier)
-
-        if(self.accessory_slot_3.what_stat_is_multiplied == Stat.DAMAGE):
-            damage_multipliers * (self.accessory_slot_3.stat_multiplier * self.self.accessory_slot_3.floor_multiplier)
-
-        self.damage = (self.base_damage + self.weapon_slot.damage) * damage_multipliers
+    def validate_stats_with_accessories(self):
+        """Calculate final stats based on accessories and equipment."""
         
-
-
+        # Calculate multipliers from accessories
+        damage_multipliers = 1.0
+        health_multipliers = 1.0
+        healing_multipliers = 1.0
+        
+        # Loop through all accessory slots
+        for accessory_slot in [self.accessory_slot_1, self.accessory_slot_2, self.accessory_slot_3]:
+            if accessory_slot is None:
+                continue
+            
+            multiplier = accessory_slot.stat_multiplier * accessory_slot.floor_multiplier
+            
+            if accessory_slot.what_stat_is_multiplied == Stat.DAMAGE:
+                damage_multipliers *= multiplier
+            elif accessory_slot.what_stat_is_multiplied == Stat.HEALTH:
+                health_multipliers *= multiplier
+            elif accessory_slot.what_stat_is_multiplied == Stat.HEALING:
+                healing_multipliers *= multiplier
+        
+        # Apply multipliers to final stats
+        self.damage = (self.base_damage + self.weapon_slot.damage) * damage_multipliers
+        self.max_health = self.base_max_health * health_multipliers
+        self.healing_capacity = self.base_healing_capacity * healing_multipliers
+        
+        return self
