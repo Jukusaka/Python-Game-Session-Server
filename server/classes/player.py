@@ -129,5 +129,3 @@ class Player(BaseModel):
         object.__setattr__(self, 'healing_capacity', float(self.base_healing_capacity * healing_multipliers))
 
         return self
-        
-        return self
