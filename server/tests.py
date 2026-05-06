@@ -1,2 +1,6 @@
 import unittest
-import classes.enemy
+
+from classes import (
+    enemy
+)
+
