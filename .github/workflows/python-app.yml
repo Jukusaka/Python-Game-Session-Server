@@ -18,14 +18,14 @@ jobs:
       with:
         python-version: '3.10'  # or your preferred version
     - name: Install dependencies
-      run: pip install -r requirements.txt
+      run: pip install -r server/requirements.txt
     - name: testing
       id: testing
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: testing
         setup-command: ""
-        command: python -m unittest discover -s . -p "test*.py" -v
+        command: python -m unittest discover -s . -p "server/test*.py" -v
         timeout: 10
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
