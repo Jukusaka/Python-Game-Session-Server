@@ -33,7 +33,8 @@ class Player(BaseModel):
     damage: float # This is after stat modifiers
     base_healing_capacity: float # This is before stat modifiers
     healing_capacity: float
-    armour: float
+    base_defence: float
+    defence: float
 
     # Items
     weapon_slot: Weapon
@@ -122,6 +123,12 @@ class Player(BaseModel):
                 health_multipliers *= multiplier
             elif accessory_slot.what_stat_is_multiplied == Stat.HEALING_CAPACITY:
                 healing_multipliers *= multiplier
+            elif accessory_slot.what_stat_is_multiplied == Stat.DEFENCE:
+                if self.defence == self.base_defence:
+                    object.__setattr__(self, 'defence', float(self.base_defence + accessory_slot.stat_multiplier))
+                else:
+                    object.__setattr__(self, 'defence', float(self.defence + accessory_slot.stat_multiplier))
+
         
         # Apply multipliers to final stats (bypass pydantic assignment hooks)
         object.__setattr__(self, 'damage', float((self.base_damage + self.weapon_slot.damage) * damage_multipliers))
