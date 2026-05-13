@@ -319,7 +319,7 @@ class TestPlayerEndpoint(unittest.TestCase):
         mock_conn = MagicMock()
         mock_cur = MagicMock()
 
-        mock_cur.fetchone.side_effect = [{}, None, {"id": 123}]
+        mock_cur.fetchone.side_effect = [{"1": 1}, None, {"id": 123}]
         mock_conn.cursor.return_value = mock_cur
         mock_get_db_connection.return_value = mock_conn
 
@@ -332,7 +332,7 @@ class TestPlayerEndpoint(unittest.TestCase):
         mock_conn = MagicMock()
         mock_cur = MagicMock()
         # 1) player exists, 2) active-match check -> returns a row (player already in match)
-        mock_cur.fetchone.side_effect = [{}, {"id": 5, "status": "waiting"}]
+        mock_cur.fetchone.side_effect = [{"1": 1}, {"id": 5, "status": "waiting"}]
         mock_conn.cursor.return_value = mock_cur
         mock_get_db_connection.return_value = mock_conn
 
