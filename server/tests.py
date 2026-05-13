@@ -1,4 +1,6 @@
 import unittest
+from unittest.mock import MagicMock, patch
+from fastapi.testclient import TestClient
 
 from classes.enemy import Enemy
 from classes.item import Item
@@ -7,6 +9,9 @@ from classes.player import Player, PlayerClass
 from classes.armour import Armour
 from classes.accessory import Accessory, Stat
 
+from main import app
+
+# --- CLASSES ---
 
 class TestPlayer(unittest.TestCase):
 
@@ -52,6 +57,8 @@ class TestPlayer(unittest.TestCase):
             damage=10.0,
             base_healing_capacity=0.0,
             healing_capacity=0.0,
+            base_defence=0.0,
+            defence=0.0,
             armour=0.0,
             weapon_slot=self.weapon,
             armour_slot=self.armour,
@@ -76,6 +83,8 @@ class TestPlayer(unittest.TestCase):
                 damage=5,
                 base_healing_capacity=0,
                 healing_capacity=0,
+                base_defence=0.0,
+                defence=0.0,
                 armour=0,
                 weapon_slot=self.weapon,
                 armour_slot=self.armour,
@@ -201,6 +210,109 @@ class TestWeapon(unittest.TestCase):
             weapon_type=WeaponType.CLERIC,
         )
         self.assertEqual(wand.healing_capacity, 3)
+
+
+# --- ENDPOINTS --- 
+
+client = TestClient(app)
+
+class TestPlayerEndpoint(unittest.TestCase):
+    @patch("main.get_db_connection")
+    def test_get_player_success(self, mock_get_db_connection):
+        # Setup mocks
+        mock_conn = MagicMock()
+        mock_cur = MagicMock()
+        
+        # Simulate db returning a dict for the player
+        mock_cur.fetchone.return_value = {"id": 1, "player_name": "Hero1", "player_class": "knight"}
+        mock_conn.cursor.return_value = mock_cur
+        mock_get_db_connection.return_value = mock_conn
+
+        # Call endpoint
+        response = client.get("/player/1")
+
+        # Assertions
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["player_name"], "Hero1")
+
+    @patch("main.get_db_connection")
+    def test_get_player_not_found(self, mock_get_db_connection):
+        mock_conn = MagicMock()
+        mock_cur = MagicMock()
+
+        mock_cur.fetchone.return_value = None
+        mock_conn.cursor.return_value = mock_cur
+        mock_get_db_connection.return_value = mock_conn
+
+        response = client.get("/player/9999")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["detail"], "Player not found")
+
+    @patch("main.get_db_connection")
+    def test_get_reward_choices_success(self, mock_get_db_connection):
+        mock_conn = MagicMock()
+        mock_cur = MagicMock()
+
+        # get_reward_choices does two initial queries: check_player_match and check_player_class
+        # We simulate multiple fetchone() calls using side_effect with a list
+        mock_cur.fetchone.side_effect = [
+            {"id": 1, "status": "active"}, # Match row
+            {"player_class": "cleric"}     # Player row
+        ]
+        
+        mock_conn.cursor.return_value = mock_cur
+        mock_get_db_connection.return_value = mock_conn
+
+        response = client.get("/rewardChoices/1")
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # We expect 3 reward choices
+        self.assertEqual(len(data), 3)
+        self.assertIn("choice_index", data[0])
+        self.assertIn("item_type", data[0])
+        self.assertIn("item_data", data[0])
+
+    @patch("main.get_db_connection")
+    def test_select_reward_success(self, mock_get_db_connection):
+        mock_conn = MagicMock()
+        mock_cur = MagicMock()
+
+        # select_reward requires two fetchone() calls if successful
+        # 1. Fetch the pending reward choice from DB
+        # 2. Get the new item_id from the INSERT ... RETURNING id query
+        mock_cur.fetchone.side_effect = [
+            {
+                "choice_index": 1,
+                "item_type": "weapon",
+                "name": "Shiny Sword",
+                "sprite_path": "path",
+                "floor_multiplier": 1,
+                "damage": 10,
+                "healing_capacity": 0,
+                "weapon_class": "knight"
+            },
+            {"id": 42} # The returned item_id
+        ]
+        
+        mock_conn.cursor.return_value = mock_cur
+        mock_get_db_connection.return_value = mock_conn
+
+        # Call endpoint with valid index
+        response = client.post("/selectReward/1", json={"selected_index": 1})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "success")
+        self.assertEqual(response.json()["item_id"], 42)
+
+    def test_select_reward_invalid_index(self):
+        # We don't need to patch DB here because the index check happens before DB connection
+        response = client.post("/selectReward/1", json={"selected_index": 9}) # 9 is invalid
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["detail"], "Invalid choice index. Must be 1, 2, or 3.")
 
 if __name__ == '__main__':
     unittest.main()
