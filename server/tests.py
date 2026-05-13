@@ -314,5 +314,31 @@ class TestPlayerEndpoint(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["detail"], "Invalid choice index. Must be 1, 2, or 3.")
 
+    @patch("main.get_db_connection")
+    def test_create_match_success(self, mock_get_db_connection):
+        mock_conn = MagicMock()
+        mock_cur = MagicMock()
+
+        mock_cur.fetchone.side_effect = [{}, None, {"id": 123}]
+        mock_conn.cursor.return_value = mock_cur
+        mock_get_db_connection.return_value = mock_conn
+
+        response = client.post("/createMatch/1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["match_id"], 123)
+
+    @patch("main.get_db_connection")
+    def test_create_match_conflict(self, mock_get_db_connection):
+        mock_conn = MagicMock()
+        mock_cur = MagicMock()
+        # 1) player exists, 2) active-match check -> returns a row (player already in match)
+        mock_cur.fetchone.side_effect = [{}, {"id": 5, "status": "waiting"}]
+        mock_conn.cursor.return_value = mock_cur
+        mock_get_db_connection.return_value = mock_conn
+
+        response = client.post("/createMatch/1")
+        self.assertEqual(response.status_code, 409)
+        self.assertIn("already in", response.json()["detail"])
+
 if __name__ == '__main__':
     unittest.main()

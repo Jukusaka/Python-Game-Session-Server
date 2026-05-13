@@ -260,21 +260,22 @@ def create_match(player_id: int):
 
         # 3) insert new match and return id
         cur.execute(
-            """
-            INSERT INTO matches (player_1_id, status, floor_number)
-            VALUES (%s, %s, %s)
-            RETURNING id
-            """,
+            "INSERT INTO matches (player_1_id, status, floor_number) VALUES (%s, %s, %s) RETURNING id",
             (player_id, "waiting", 0),
         )
         match_id = cur.fetchone()["id"]
         conn.commit()
 
         return {"match_id": match_id, "status": "waiting", "floor_number": 0}
-    
+
+    except HTTPException:
+        conn.rollback()
+        raise
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     finally:
-        cur.close()
-        conn.close()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
