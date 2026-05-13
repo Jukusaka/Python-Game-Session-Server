@@ -1,2 +1,5 @@
 fastapi[standard]==0.135.3
 pydantic[email]
+python-dotenv
+psycopg2
+psycopg2.extras
