@@ -271,3 +271,48 @@ def select_reward(player_id: int, req: SelectionRequest):
     finally:
         cur.close()
         conn.close()
+
+@app.post("/createMatch/{player_id}")
+def create_match(player_id: int):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    try:
+        # 1) verify player exists
+        cur.execute("SELECT 1 FROM players WHERE id = %s", (player_id,))
+        if not cur.fetchone():
+            raise HTTPException(status_code=404, detail="Player not found")
+
+        # 2) ensure player is not already in a non-finished match
+        cur.execute(
+            """
+            SELECT id FROM matches
+            WHERE (player_1_id = %s OR player_2_id = %s OR player_3_id = %s OR player_4_id = %s)
+              AND status != %s
+            LIMIT 1
+            """,
+            (player_id, player_id, player_id, player_id, "finished"),
+        )
+        if cur.fetchone():
+            raise HTTPException(status_code=409, detail="Player already in an active match")
+
+        # 3) insert new match and return id
+        cur.execute(
+            "INSERT INTO matches (player_1_id, status, floor_number) VALUES (%s, %s, %s) RETURNING id",
+            (player_id, "waiting", 0),
+        )
+        match_id = cur.fetchone()["id"]
+        conn.commit()
+
+        return {"match_id": match_id, "status": "waiting", "floor_number": 0}
+
+    except HTTPException:
+        conn.rollback()
+        raise
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
