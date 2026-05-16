@@ -157,7 +157,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Main" type="MarginContainer" parent="." unique_id=2001336648]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2001336648]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -169,15 +169,15 @@ theme_override_constants/margin_top = 32
 theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 32
 
-[node name="ColumnsContainer" type="HBoxContainer" parent="Main" unique_id=1445321534]
+[node name="ColumnsContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1445321534]
 layout_mode = 2
 
-[node name="LeftColumn" type="VBoxContainer" parent="Main/ColumnsContainer" unique_id=607359852]
+[node name="LeftColumn" type="VBoxContainer" parent="MarginContainer/ColumnsContainer" unique_id=607359852]
 layout_mode = 2
 size_flags_horizontal = 3
 metadata/_edit_use_anchors_ = true
 
-[node name="GameTitle" type="Label" parent="Main/ColumnsContainer/LeftColumn" unique_id=230456782]
+[node name="GameTitle" type="Label" parent="MarginContainer/ColumnsContainer/LeftColumn" unique_id=230456782]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = SubResource("FontFile_bqqt6")
@@ -185,116 +185,131 @@ theme_override_font_sizes/font_size = 40
 text = "Tower Climb"
 horizontal_alignment = 1
 
-[node name="CreatorBox" type="VBoxContainer" parent="Main/ColumnsContainer/LeftColumn" unique_id=859190996]
+[node name="CreatorBox" type="VBoxContainer" parent="MarginContainer/ColumnsContainer/LeftColumn" unique_id=859190996]
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="NameRow" type="HBoxContainer" parent="Main/ColumnsContainer/LeftColumn/CreatorBox" unique_id=2145289602]
+[node name="NameRow" type="HBoxContainer" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox" unique_id=2145289602]
 layout_mode = 2
 
-[node name="Label_Name" type="Label" parent="Main/ColumnsContainer/LeftColumn/CreatorBox/NameRow" unique_id=850029043]
+[node name="Label_Name" type="Label" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox/NameRow" unique_id=850029043]
 layout_mode = 2
 text = "Player Name:"
 
-[node name="NameInput" type="LineEdit" parent="Main/ColumnsContainer/LeftColumn/CreatorBox/NameRow" unique_id=1299388491]
+[node name="NameInput" type="LineEdit" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox/NameRow" unique_id=1299388491]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 placeholder_text = "Name"
 
-[node name="AvailablePointsLabel" type="Label" parent="Main/ColumnsContainer/LeftColumn/CreatorBox" unique_id=243097939]
+[node name="PointsLabel" type="Label" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox" unique_id=243097939]
+unique_name_in_owner = true
 layout_mode = 2
+theme_override_font_sizes/font_size = 22
 text = "Available Points: 5"
 horizontal_alignment = 1
 
-[node name="DefLabel" type="Label" parent="Main/ColumnsContainer/LeftColumn/CreatorBox" unique_id=1208862362]
+[node name="DefLabel" type="Label" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox" unique_id=1208862362]
 layout_mode = 2
 text = "
 Defence
 "
 horizontal_alignment = 1
 
-[node name="DefenceRow" type="HBoxContainer" parent="Main/ColumnsContainer/LeftColumn/CreatorBox" unique_id=604162839]
+[node name="DefenceRow" type="HBoxContainer" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox" unique_id=604162839]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="DefMinusBtn" type="Button" parent="Main/ColumnsContainer/LeftColumn/CreatorBox/DefenceRow" unique_id=603803523]
+[node name="DefMinusBtn" type="Button" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox/DefenceRow" unique_id=603803523]
+unique_name_in_owner = true
 layout_mode = 2
 text = "-"
 
-[node name="DefLabel" type="Label" parent="Main/ColumnsContainer/LeftColumn/CreatorBox/DefenceRow" unique_id=636344824]
+[node name="DefLabel" type="Label" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox/DefenceRow" unique_id=636344824]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 6
 theme_override_font_sizes/font_size = 22
 text = "10"
 
-[node name="DefPlusBtn" type="Button" parent="Main/ColumnsContainer/LeftColumn/CreatorBox/DefenceRow" unique_id=932357164]
+[node name="DefPlusBtn" type="Button" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox/DefenceRow" unique_id=932357164]
+unique_name_in_owner = true
 layout_mode = 2
 text = "+"
 
-[node name="AtkLabel" type="Label" parent="Main/ColumnsContainer/LeftColumn/CreatorBox" unique_id=1115468658]
+[node name="AtkLabel" type="Label" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox" unique_id=1115468658]
 layout_mode = 2
 text = "
 Attack
 "
 horizontal_alignment = 1
 
-[node name="AttackRow" type="HBoxContainer" parent="Main/ColumnsContainer/LeftColumn/CreatorBox" unique_id=1551062691]
+[node name="AttackRow" type="HBoxContainer" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox" unique_id=1551062691]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="AtkMinusBtn" type="Button" parent="Main/ColumnsContainer/LeftColumn/CreatorBox/AttackRow" unique_id=1608040307]
+[node name="AtkMinusBtn" type="Button" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox/AttackRow" unique_id=1608040307]
+unique_name_in_owner = true
 layout_mode = 2
 text = "-"
 
-[node name="DefLabel" type="Label" parent="Main/ColumnsContainer/LeftColumn/CreatorBox/AttackRow" unique_id=2132776780]
+[node name="AtkLabel" type="Label" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox/AttackRow" unique_id=2132776780]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 6
 theme_override_font_sizes/font_size = 22
 text = "10"
 
-[node name="AtkPlusBtn" type="Button" parent="Main/ColumnsContainer/LeftColumn/CreatorBox/AttackRow" unique_id=1779406747]
+[node name="AtkPlusBtn" type="Button" parent="MarginContainer/ColumnsContainer/LeftColumn/CreatorBox/AttackRow" unique_id=1779406747]
+unique_name_in_owner = true
 layout_mode = 2
 text = "+"
 
-[node name="ClassSelectorRow" type="HBoxContainer" parent="Main/ColumnsContainer/LeftColumn" unique_id=1459352577]
+[node name="ClassSelectorRow" type="HBoxContainer" parent="MarginContainer/ColumnsContainer/LeftColumn" unique_id=1459352577]
 layout_mode = 2
 size_flags_vertical = 10
 
-[node name="PrevClassBtn" type="Button" parent="Main/ColumnsContainer/LeftColumn/ClassSelectorRow" unique_id=21139274]
+[node name="PrevClassBtn" type="Button" parent="MarginContainer/ColumnsContainer/LeftColumn/ClassSelectorRow" unique_id=21139274]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 text = "<"
 
-[node name="ClassProtrait" type="TextureRect" parent="Main/ColumnsContainer/LeftColumn/ClassSelectorRow" unique_id=57019239]
+[node name="ClassPortrait" type="TextureRect" parent="MarginContainer/ColumnsContainer/LeftColumn/ClassSelectorRow" unique_id=57019239]
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_horizontal = 3
 texture = ExtResource("2_ekxnf")
 
-[node name="NextClassBtn" type="Button" parent="Main/ColumnsContainer/LeftColumn/ClassSelectorRow" unique_id=825275757]
+[node name="NextClassBtn" type="Button" parent="MarginContainer/ColumnsContainer/LeftColumn/ClassSelectorRow" unique_id=825275757]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 text = ">"
 
-[node name="RightColumn" type="VBoxContainer" parent="Main/ColumnsContainer" unique_id=519201512]
+[node name="RightColumn" type="VBoxContainer" parent="MarginContainer/ColumnsContainer" unique_id=519201512]
 layout_mode = 2
 size_flags_horizontal = 3
 metadata/_edit_use_anchors_ = true
 
-[node name="CreateRoom" type="Button" parent="Main/ColumnsContainer/RightColumn" unique_id=309435197]
+[node name="CreateRoom" type="Button" parent="MarginContainer/ColumnsContainer/RightColumn" unique_id=309435197]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
 text = "CREATE ROOM"
 
-[node name="RoomListScroll" type="ScrollContainer" parent="Main/ColumnsContainer/RightColumn" unique_id=574181422]
+[node name="RoomListScroll" type="ScrollContainer" parent="MarginContainer/ColumnsContainer/RightColumn" unique_id=574181422]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="RoomListContainer" type="VBoxContainer" parent="Main/ColumnsContainer/RightColumn/RoomListScroll" unique_id=1918485315]
+[node name="RoomListContainer" type="VBoxContainer" parent="MarginContainer/ColumnsContainer/RightColumn/RoomListScroll" unique_id=1918485315]
 layout_mode = 2
 
-[node name="LogMessageLabel" type="Label" parent="Main/ColumnsContainer/RightColumn" unique_id=758907559]
+[node name="LogMessageLabel" type="Label" parent="MarginContainer/ColumnsContainer/RightColumn" unique_id=758907559]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Your Player has no name!!!"
