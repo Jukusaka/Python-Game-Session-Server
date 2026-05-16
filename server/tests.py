@@ -52,6 +52,7 @@ class TestPlayer(unittest.TestCase):
             damage=10.0,
             base_healing_capacity=0.0,
             healing_capacity=0.0,
+            base_defence=0.0,
             armour=0.0,
             weapon_slot=self.weapon,
             armour_slot=self.armour,
@@ -76,6 +77,7 @@ class TestPlayer(unittest.TestCase):
                 damage=5,
                 base_healing_capacity=0,
                 healing_capacity=0,
+                base_defence=0.0,
                 armour=0,
                 weapon_slot=self.weapon,
                 armour_slot=self.armour,
@@ -94,7 +96,7 @@ class TestEnemy(unittest.TestCase):
 
     def setUp(self):
         """Create a test enemy before each test."""
-        self.enemy = Enemy(max_hp=100, current_hp=100, room_number=1, damage=20, armour=5)
+        self.enemy = Enemy(max_hp=100, current_hp=100, name="Orc", damage=20, armour=5)
 
     # Validator tests
     def test_valid_enemy_creation(self):
@@ -105,12 +107,12 @@ class TestEnemy(unittest.TestCase):
     def test_max_hp_must_be_positive(self):
         """Test that max_hp validation works."""
         with self.assertRaises(ValueError):
-            Enemy(max_hp=-10, current_hp=50, room_number=1, damage=20, armour=5)
+            Enemy(max_hp=-10, current_hp=50, name="Orc", damage=20, armour=5)
 
     def test_current_hp_cannot_exceed_max(self):
         """Test that current_hp can't be higher than max_hp."""
         with self.assertRaises(ValueError):
-            Enemy(max_hp=100, current_hp=150, room_number=1, damage=20, armour=5)
+            Enemy(max_hp=100, current_hp=150, name="Orc", damage=20, armour=5)
 
     # Method tests
     def test_take_damage(self):

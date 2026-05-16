@@ -115,7 +115,7 @@ class Player(BaseModel):
             if accessory_slot is None:
                 continue
             
-            multiplier = accessory_slot.stat_multiplier * accessory_slot.floor_multiplier
+            multiplier = accessory_slot.stat_multiplier
             
             if accessory_slot.what_stat_is_multiplied == Stat.DAMAGE:
                 damage_multipliers *= multiplier

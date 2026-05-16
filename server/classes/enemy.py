@@ -2,15 +2,16 @@ import random
 
 from pydantic import (
     BaseModel,
-    field_validator
+    field_validator,
+    model_validator
 )
 
 class Enemy(BaseModel):
     max_hp: float
-    current_hp: float
-    room_number: int
+    current_hp: float = 0
     damage: float
     armour: int
+    name: str
 
     @field_validator('max_hp')
     @classmethod
@@ -57,3 +58,9 @@ class Enemy(BaseModel):
         variance = random.randint(-2, 2) # ±2 variance
 
         return self.damage + variance
+    
+
+    @model_validator(mode='after')
+    def validate_stats(self):
+        object.__setattr__(self, 'current_health', self.max_hp)
+    
