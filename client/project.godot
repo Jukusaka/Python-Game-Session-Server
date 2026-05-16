@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="TowerClimb"
+run/main_scene="uid://bgt7ndrkp2avd"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
