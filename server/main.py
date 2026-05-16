@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from fastapi import FastAPI, HTTPException
@@ -99,7 +97,7 @@ def generate_enemies(current_floor: int, player_name: str):
 
 
 
-    
+
 
 # Connection settings
 DB_PARAMS = {
@@ -466,4 +464,3 @@ def start_match(match_id: int):
     finally:
         cur.close()
         conn.close()
->>>>>>> Stashed changes
