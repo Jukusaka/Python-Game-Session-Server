@@ -57,6 +57,8 @@ func _ready() -> void:
 	
 	# Fire the first request immediately
 	_fetch_matches()
+	
+	http_request.request_completed.connect(_on_match_created)
 
 func update_ui() -> void:
 	if points_label: points_label.text = "Available points: " + str(starter_points)
@@ -138,6 +140,36 @@ func _on_create_room_btn_pressed() -> void:
 	dynamic_request.request_completed.connect(func(_a,_b,_c,_d): dynamic_request.queue_free())
 	
 	dynamic_request.request(BASE_URL + "/addPlayer", headers, HTTPClient.METHOD_POST, json_body)
+
+# Inside main_menu.gd: Add this new function to capture the match id and shift scenes
+func _on_match_created(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray) -> void:
+	if response_code in [200, 201]:
+		var response_string = body.get_string_from_utf8()
+		var json = JSON.new()
+		if json.parse(response_string) == OK:
+			var data_received = json.get_data()
+			var match_dict: Dictionary = {}
+			
+			# SAFE CHECK: Check if the server returned an Array or a Dictionary
+			if typeof(data_received) == TYPE_ARRAY:
+				if not data_received.is_empty():
+					match_dict = data_received[0] # Grab the dictionary inside the first array slot
+			elif typeof(data_received) == TYPE_DICTIONARY:
+				match_dict = data_received
+				
+			# Now verify if we successfully found a valid dictionary with match_id
+			if match_dict.has("match_id"):
+				GlobalVariables.match_id = int(str(match_dict.get("match_id")))
+				print("Match created successfully! Saved Match ID: ", GlobalVariables.match_id)
+				
+				# Redirect user into your lobby screen
+				get_tree().change_scene_to_file("res://scenes/lobby.tscn")
+			else:
+				print("Server response was parsed but 'match_id' was not found inside: ", data_received)
+				log_message_label.text = "Error parsing match server data."
+	else:
+		print("Failed to create match. Server responded with code: ", response_code)
+		log_message_label.text = "Failed to create match room."
 
 func _on_player_created(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray) -> void:
 	var response_string = body.get_string_from_utf8()

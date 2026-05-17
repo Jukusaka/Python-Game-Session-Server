@@ -160,8 +160,12 @@ func _on_join_match_completed(result: int, response_code: int, headers: PackedSt
 		return
 		
 	print("Successfully Joined! Changing scenes...")
-	# CHANGE SCENE HERE!!!!!!!!
-	# get_tree().change_scene_to_file("res://scenes/game_lobby.tscn")
+	
+	# Save the active card ID to your system's global tracking space
+	GlobalVariables.match_id = current_match_id
+	
+	# Transition over into the active lobby workspace
+	get_tree().change_scene_to_file("res://scenes/lobby.tscn")
 
 # Helper utility to read global variables safely if undefined
 func getattr(obj: Object, property: String, default_val):
