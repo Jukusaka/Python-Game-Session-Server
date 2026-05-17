@@ -39,10 +39,15 @@ func _ready() -> void:
 	%NextClassBtn.pressed.connect(_on_next_class_btn_pressed)
 	%CreateRoom.pressed.connect(_on_create_room_btn_pressed)
 	
+	# ---> ADD THIS LINE HERE TO BIND YOUR LINEEDIT SIGNAL <---
+	%NameInput.text_changed.connect(_on_name_input_text_changed)
+	
 	update_ui()
 	
 	# 1. Connect the HTTP Request node's completion signal
 	poll_http_request.request_completed.connect(_on_poll_request_completed)
+	
+	# ... (rest of your ready function remains the same) ...
 	
 	# 2. Setup the Polling Timer dynamically
 	var poll_timer = Timer.new()
@@ -64,7 +69,6 @@ func update_ui() -> void:
 	if points_label: points_label.text = "Available points: " + str(starter_points)
 	if def_label: def_label.text = str(defence_stat)
 	if atk_label: atk_label.text = str(attack_stat)
-	print("Current selected class: ", classes[current_class_index])
 	GlobalVariables.player_class = classes[current_class_index]
 	
 	if name_input && name_input.text.strip_edges() != "":
@@ -165,7 +169,7 @@ func _on_match_created(result: int, response_code: int, headers: PackedStringArr
 				# Redirect user into your lobby screen
 				get_tree().change_scene_to_file("res://scenes/lobby.tscn")
 			else:
-				print("Server response was parsed but 'match_id' was not found inside: ", data_received)
+				print("Server response was parsed but 'match_id' was not found inside")
 				log_message_label.text = "Error parsing match server data."
 	else:
 		print("Failed to create match. Server responded with code: ", response_code)
@@ -280,5 +284,10 @@ func _update_match_list(matches: Array) -> void:
 				card_to_remove.queue_free()
 
 
+# --- TEXT INPUT HANDLERS ---
+
 func _on_name_input_text_changed(new_text: String) -> void:
 	GlobalVariables.player_name = new_text
+	# Optional: Clear the error warning if they start typing a valid name
+	if new_text.strip_edges() != "" and new_text.length() <= 10:
+		log_message_label.text = ""

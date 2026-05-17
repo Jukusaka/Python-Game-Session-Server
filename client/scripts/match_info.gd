@@ -62,7 +62,6 @@ func _on_get_data_completed(result: int, response_code: int, headers: PackedStri
 	
 	if parse_result == OK:
 		data = json.get_data()
-		print("Data received successfully!", data)
 		matchName.text = str(data.get("player_name", "Unknown")) + "'s lobby"
 	else:
 		print("Failed to parse JSON response.")
